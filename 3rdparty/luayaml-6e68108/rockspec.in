@@ -1,0 +1,36 @@
+package = "yaml"
+version = "%VERSION%-1"
+
+description = {
+    summary = "Lua YAML serialization using LibYAML",
+    license = "MIT/X11",
+    homepage = "https://github.com/craigbarnes/lua-yaml",
+    detailed = [[
+        This module is a Lua binding for Kirill Siminov's excellent LibYAML,
+        which is generally considered to be the best C YAML 1.1 implementation.
+
+        This module defines the functions dump, load, and configure within the
+        global yaml table.
+    ]]
+}
+
+supported_platforms = {"unix"}
+
+external_dependencies = {
+    YAML = {header = "yaml.h"}
+}
+
+source = {
+    url = "git://github.com/craigbarnes/lua-yaml.git",
+    tag = "%VERSION%"
+}
+
+build = {
+    type = 'make',
+    variables = {
+        PREFIX = '$(PREFIX)',
+        LIBDIR = '$(LIBDIR)',
+        CFLAGS = '$(CFLAGS) -I$(LUA_INCDIR)',
+        LDFLAGS = '$(LIBFLAG)',
+    }
+}
