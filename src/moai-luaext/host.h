@@ -9,10 +9,23 @@
 
 #include <moai-core/host.h>
 
-AKU_API void	AKUExtLoadLuacrypto			();
-AKU_API void	AKUExtLoadLuacurl			();
-AKU_API void	AKUExtLoadLuafilesystem		();
-AKU_API void	AKUExtLoadLuasocket			();
-AKU_API void	AKUExtLoadLuasql			();
+AKU_API void	AKUExtLoadLuafilesystem ();
+AKU_API void	AKUExtLoadLuasocket ();
+
+#if MOAI_WITH_CRYPTO
+	AKU_API void	AKUExtLoadLuacrypto ();
+#endif
+
+#if MOAI_WITH_CURL
+	AKU_API void	AKUExtLoadLuacurl ();
+#endif
+
+#if MOAI_WITH_SQLITE3
+AKU_API void	AKUExtLoadLuasql ();
+#endif
+
+#if MOAI_WITH_YAML
+	AKU_API void	AKUExtLoadLuayaml	();
+#endif
 
 #endif
