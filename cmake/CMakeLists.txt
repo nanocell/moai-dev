@@ -78,6 +78,7 @@ option ( MOAI_PNG            FALSE )
 option ( MOAI_SFMT           FALSE )
 option ( MOAI_VORBIS         FALSE )
 option ( MOAI_UNTZ           FALSE )
+option ( MOAI_YAML           FALSE )
 
 # Not sure about this one
 #set ( MOAI_OPENGLES1      FALSE CACHE STRING "Build Moai SDK with OpenGL ES 1.0 Support" FORCE )

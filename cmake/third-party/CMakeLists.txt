@@ -27,7 +27,9 @@ add_subdirectory ( tinyxml )
 add_subdirectory ( tlsf )
 add_subdirectory ( untz )
 add_subdirectory ( vorbis )
+add_subdirectory ( yaml )
 add_subdirectory ( zlib )
+
 
 set ( THIRD_PARTY_INCLUDES
 
@@ -52,6 +54,7 @@ set ( THIRD_PARTY_INCLUDES
   ${TLSF_INCLUDES}
   ${UNTZ_INCLUDES}
   ${VORBIS_INCLUDES}
+  ${YAML_INCLUDES}
   ${ZLIB_INCLUDES}
   ${GLEW_INCLUDES}
   "../../3rdparty/ooid-0.99/"
@@ -84,6 +87,7 @@ add_library ( third-party STATIC
   ${TLSF_SOURCES}
   ${UNTZ_SOURCES}
   ${VORBIS_SOURCES}
+  ${YAML_SOURCES}
   ${ZLIB_SOURCES}
   ${GLEW_SOURCES}
 )
