@@ -486,11 +486,24 @@ void GlutRefreshContext () {
 	#endif
 	
 	#if MOAI_WITH_LUAEXT
-		AKUExtLoadLuacrypto ();
-		AKUExtLoadLuacurl ();
+		#if MOAI_WITH_CRYPTO
+			AKUExtLoadLuacrypto ();
+		#endif
+		
+		#if MOAI_WITH_CURL
+			AKUExtLoadLuacurl ();
+		#endif
+		
 		AKUExtLoadLuafilesystem ();
 		AKUExtLoadLuasocket ();
-		AKUExtLoadLuasql ();
+		
+		#if MOAI_WITH_SQLITE3
+			AKUExtLoadLuasql ();
+		#endif
+
+		#if MOAI_WITH_YAML
+			AKUExtLoadLuayaml();
+		#endif
 	#endif
 	
 	#if MOAI_WITH_HARNESS
