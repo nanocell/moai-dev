@@ -59,6 +59,7 @@ private:
 
 	//----------------------------------------------------------------//
 	static int	_clear				( lua_State* L );
+	static int	_getCamera  		( lua_State* L );
 	static int	_getFitting			( lua_State* L );
 	static int	_getPartition		( lua_State* L );
 	static int	_getSortMode		( lua_State* L );

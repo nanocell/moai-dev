@@ -105,6 +105,23 @@ int	MOAILayer::_getPartition ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	getCamera
+	@text	Returns the camera (if any) currently attached to this layer.
+
+	@in		MOAILayer self
+	@out	MOAICamera camera
+*/
+int	MOAILayer::_getCamera ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAILayer, "U" )
+
+	if ( self->mCamera ) {
+		self->mCamera->PushLuaUserdata ( state );
+		return 1;
+	}
+	return 0;
+}
+
+//----------------------------------------------------------------//
 /**	@name	getSortMode
 	@text	Get the sort mode for rendering.
 	
@@ -745,6 +762,7 @@ void MOAILayer::RegisterLuaFuncs ( MOAILuaState& state ) {
 	
 	luaL_Reg regTable [] = {
 		{ "clear",					_clear },
+		{ "getCamera",			  _getCamera },
 		{ "getFitting",				_getFitting },
 		{ "getPartition",			_getPartition },
 		{ "getSortMode",			_getSortMode },
