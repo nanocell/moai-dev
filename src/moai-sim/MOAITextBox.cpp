@@ -481,6 +481,21 @@ int MOAITextBox::_setString ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	getString
+	@text	Sets the text string to be displayed by this textbox.
+
+	@in		MOAITextBox self
+	@out	string The text of the textbox
+*/
+int MOAITextBox::_getString ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAITextBox, "U" )
+
+	lua_pushstring(L, self->mText.c_str());
+
+	return 1;
+}
+
+//----------------------------------------------------------------//
 /**	@name	setStyle
 	@text	Attaches a style to the textbox and associates a name with it.
 			If no name is given, sets the default style.
@@ -1292,6 +1307,7 @@ void MOAITextBox::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getGlyphScale",			_getGlyphScale },
 		{ "getLineSpacing",			_getLineSpacing },
 		{ "getRect",				_getRect },
+		{ "getString",				_getString },
 		{ "getStringBounds",		_getStringBounds },
 		{ "getStyle",				_getStyle },
 		{ "more",					_more },
