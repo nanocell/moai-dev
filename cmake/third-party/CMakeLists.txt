@@ -57,7 +57,7 @@ set ( THIRD_PARTY_INCLUDES
   ${YAML_INCLUDES}
   ${ZLIB_INCLUDES}
   ${GLEW_INCLUDES}
-  "../../3rdparty/ooid-0.99/"
+  "${MOAI_ROOT}/3rdparty/ooid-0.99/"
 
 CACHE INTERNAL "doc string" )
 
