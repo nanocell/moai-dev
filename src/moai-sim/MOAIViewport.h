@@ -27,6 +27,9 @@ private:
 	static int		_setRotation	( lua_State* L );
 	static int		_setScale		( lua_State* L );
 	static int		_setSize		( lua_State* L );
+	static int		_getSize		( lua_State* L );
+	static int		_getScale		( lua_State* L );
+	static int		_getOffset		( lua_State* L );
 
 public:
 	

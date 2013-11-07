@@ -81,6 +81,60 @@ int MOAIViewport::_setScale ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	getScale
+	@text	Returns the viewport scale
+	
+	@in		MOAIViewport self
+	@out	scaleX (number), scaleY (number)
+*/
+
+int	MOAIViewport::_getScale ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIViewport, "U" )
+	
+	lua_pushnumber ( state, self->mScale.mX );
+	lua_pushnumber ( state, self->mScale.mY );
+
+	return 2;
+}
+
+//----------------------------------------------------------------//
+/**	@name	getSize
+	@text	Returns the viewport size
+	
+	@in		MOAIViewport self
+	@out	xmin (number), ymin (number), xmax (number), ymax (number)
+*/
+
+int	MOAIViewport::_getSize ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIViewport, "U" )
+
+	lua_pushnumber ( state, self->mXMin );
+	lua_pushnumber ( state, self->mYMin );
+
+	lua_pushnumber ( state, self->mXMax );	
+	lua_pushnumber ( state, self->mYMax );
+
+	return 4;
+}
+
+//----------------------------------------------------------------//
+/**	@name	getSize
+	@text	Returns the viewport offset
+	
+	@in		MOAIViewport self
+	@out	xoffset (number), yoffset (number)
+*/
+
+int	MOAIViewport::_getOffset ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIViewport, "U" )
+	
+	lua_pushnumber ( state, self->mOffset.mX );
+	lua_pushnumber ( state, self->mOffset.mY );
+
+	return 2;
+}
+
+//----------------------------------------------------------------//
 /**	@name	setSize
 	@text	Sets the dimensions of the this->
 	
@@ -370,6 +424,9 @@ void MOAIViewport::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "setRotation",	_setRotation },
 		{ "setScale",		_setScale },
 		{ "setSize",		_setSize },
+		{ "getSize",		_getSize },
+		{ "getScale",		_getScale },
+		{ "getOffset",		_getOffset },
 		{ NULL, NULL }
 	};
 
