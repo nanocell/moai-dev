@@ -41,6 +41,10 @@ target_link_libraries ( moai
   zlcore
 )
 
+if ( MOAI_COMPONENTS )
+  target_link_libraries ( moai moai-components )
+endif( MOAI_COMPONENTS )
+
 if ( MOAI_BOX2D )
   target_link_libraries ( moai moai-box2d )
 endif ( MOAI_BOX2D )
