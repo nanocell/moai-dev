@@ -88,7 +88,6 @@ option ( MOAI_YAML           FALSE )
 #
 option ( MOAI_HTTP_CLIENT    FALSE )
 
-
 #
 # Set as debug
 #
@@ -104,6 +103,16 @@ if ( DEBUG )
   set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4")
 endif ( DEBUG )
 
+#
+# Moai External Components
+#
+
+if( MOAI_COMPONENTS )
+  get_filename_component(cpt_path "${MOAI_COMPONENTS}" ABSOLUTE)
+  set(MOAI_COMPONENT_ROOT ${cpt_path})
+  message( "Adding external component: ${MOAI_COMPONENT_ROOT}" )
+  include("${MOAI_COMPONENT_ROOT}/cmake/CMakeLists.txt")
+endif (MOAI_COMPONENTS)
 
 #
 # Libraries

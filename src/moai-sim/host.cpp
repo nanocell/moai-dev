@@ -5,6 +5,10 @@
 #include <moai-sim/host.h>
 #include <moai-sim/headers.h>
 
+#if MOAI_WITH_EXT_COMPONENTS
+	#include <moai_ext_components.h>
+#endif
+
 //================================================================//
 // aku
 //================================================================//
@@ -216,6 +220,10 @@ void AKUInitializeSim () {
 	
 	#if MOAI_WITH_FREETYPE
 		REGISTER_LUA_CLASS ( MOAIFreeTypeFontReader )
+	#endif
+
+	#if MOAI_WITH_EXT_COMPONENTS
+		moai_init_components();
 	#endif
 	
 	MOAIEnvironment::Get ().DetectEnvironment ();

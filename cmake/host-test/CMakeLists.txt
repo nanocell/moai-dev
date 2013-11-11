@@ -42,6 +42,10 @@ target_link_libraries ( moai-test-runner
   zlcore
 )
 
+if ( MOAI_COMPONENTS )
+  target_link_libraries ( moai-test-runner moai-components )
+endif( MOAI_COMPONENTS )
+
 if ( MOAI_BOX2D )
   target_link_libraries ( moai-test-runner moai-box2d )
 endif ( MOAI_BOX2D )
