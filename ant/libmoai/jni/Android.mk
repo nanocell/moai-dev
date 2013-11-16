@@ -54,6 +54,9 @@
 		LOCAL_CFLAGS	+= -DMOAI_WITH_LUAJIT
 	endif
 
+	ifdef MOAI_COMPONENTS
+		LOCAL_CFLAGS	+= -DMOAI_WITH_EXT_COMPONENTS=1
+	endif
 	
 #----------------------------------------------------------------#
 # header search paths
@@ -123,6 +126,10 @@
 		MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/libvorbis-1.3.2/include
 		MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/libvorbis-1.3.2/lib
 		MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/libogg-1.2.2/include
+	endif
+
+	ifdef MOAI_COMPONENTS
+		MY_HEADER_SEARCH_PATHS += $(MOAI_COMPONENTS)/include
 	endif
 	
 #----------------------------------------------------------------#
