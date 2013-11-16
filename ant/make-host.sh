@@ -9,7 +9,7 @@
 	set -e
 
 	usage="usage: $0 -p <package> [-s] [-i thumb | arm] [-a all | armeabi | armeabi-v7a] [-l appPlatform] [--use-fmod \
-        true | false] [--use-untz true | false] [--use-luajit true | false] [--disable-adcolony] [--disable-billing] \
+        true | false] [--use-untz true | false] [--use-luajit true | false] [--with-moai-components <path>] [--disable-adcolony] [--disable-billing] \
         [--disable-chartboost] [--disable-crittercism] [--disable-facebook] [--disable-push] [--disable-tapjoy] \
         [--disable-twitter]"
 	skip_build="false"
@@ -20,6 +20,7 @@
 	use_fmod="false"
 	use_untz="true"
 	use_luajit="true"
+	with_moai_components=
 	adcolony_flags=
 	billing_flags=
 	chartboost_flags=
@@ -39,6 +40,7 @@
 			--use-fmod)  use_fmod="$2"; shift;;
 			--use-untz)  use_untz="$2"; shift;;
 			--use-luajit)  use_luajit="$2"; shift;;
+			--with_moai_components)  with_moai_components="$2"; shift;;
 			--disable-adcolony)  adcolony_flags="--disable-adcolony";;
 			--disable-billing)  billing_flags="--disable-billing";;
 			--disable-chartboost)  chartboost_flags="--disable-chartboost";;
@@ -88,6 +90,11 @@
 		exit 1		
 	fi
 
+	if [[ x"$with_moai_components" =~ ^x-.* ]]; then
+		echo $usage
+		exit 1
+	fi
+
 
 	if [ x"$use_fmod" == xtrue ] && [ x"$FMOD_ANDROID_SDK_ROOT" == x ]; then
 		echo "*** The FMOD SDK is not redistributed with the Moai SDK. Please download the FMOD EX"
@@ -95,6 +102,12 @@
 		echo "*** FMOD_ANDROID_SDK_ROOT environment variable is set and points to the root of the"
 		echo "*** FMOD SDK installation; e.g., /FMOD/Android"
 		exit 1		
+	fi
+
+	if [ x"$with_moai_components" != x ]; then
+		moai_components_flags="--with-moai-components $with_moai_components"
+	else
+		moai_components_flags=
 	fi
 	
 	new_host_dir="`pwd`/untitled-host"
@@ -105,7 +118,7 @@
 	if [ x"$skip_build" != xtrue ]; then
 		pushd libmoai > /dev/null
 			bash build.sh -i $arm_mode -a $arm_arch -l $app_platform --use-fmod $use_fmod --use-untz $use_untz \
-                --use-luajit $use_luajit $adcolony_flags $billing_flags $chartboost_flags $crittercism_flags \
+                --use-luajit $use_luajit $moai_components_flags $adcolony_flags $billing_flags $chartboost_flags $crittercism_flags \
                 $facebook_flags $push_flags $tapjoy_flags $twitter_flags 
 		popd > /dev/null
 	fi
