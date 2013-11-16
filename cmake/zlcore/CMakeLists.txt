@@ -2,13 +2,13 @@ cmake_minimum_required ( VERSION 2.8.5 )
 project ( zlcore )
 
 # Define source directory
-set ( CMAKE_CURRENT_SOURCE_DIR "../../src/" )
+set ( CMAKE_CURRENT_SOURCE_DIR "${MOAI_ROOT}/src/" )
 
 # Define needed include files
 set ( ZLCORE_INCLUDES 
   ${THIRD_PARTY_INCLUDES}
-  "../../src/"
-  "../../src/config-default/"
+  "${MOAI_ROOT}/src/"
+  "${MOAI_ROOT}/src/config-default/"
 CACHE INTERNAL "doc string" )
 
 # Use all cpp files in directory as source code
