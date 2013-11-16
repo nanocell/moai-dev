@@ -10,15 +10,16 @@
 	
 	# check for command line switches
 	usage="usage: $0 [-v] [-i thumb | arm] [-a all | armeabi | armeabi-v7a] [-l appPlatform] [--use-fmod true | false] \
-        [--use-untz true | false] [--use-luajit true | false] [--with-moai-components <path>] [--disable-adcolony] [--disable-billing] \
-        [--disable-chartboost] [--disable-crittercism] [--disable-facebook] [--disable-push] [--disable-tapjoy] \
-        [disable-twitter]"
+        [--use-untz true | false] [--use-luajit true | false] [--use-yaml true | false] | [--with-moai-components <path>] \
+        [--disable-adcolony] [--disable-billing] [--disable-chartboost] [--disable-crittercism] [--disable-facebook] \
+        [--disable-push] [--disable-tapjoy] [disable-twitter]"
 	arm_mode="arm"
 	arm_arch="armeabi-v7a"
 	app_platform="android-10"
 	use_fmod="false"
 	use_untz="true"
 	use_luajit="true"
+	use_yaml="false"
 	with_moai_components=
 	adcolony_flags=
 	billing_flags=
@@ -38,6 +39,7 @@
 			--use-fmod)  use_fmod="$2"; shift;;
 			--use-untz)  use_untz="$2"; shift;;
 			--use-luajit)  use_luajit="$2"; shift;;
+			--use-yaml)  use_yaml="$2"; shift;;
 			--with-moai-components)  with_moai_components="$2"; shift;;
 			--disable-adcolony)  adcolony_flags="-DDISABLE_ADCOLONY";;
 			--disable-billing)  billing_flags="-DDISABLE_BILLING";;
@@ -90,6 +92,11 @@
 		exit 1
 	fi
 	
+    if [ x"$use_yaml" != xtrue ] && [ x"$use_yaml" != xfalse ]; then
+		echo $usage
+		exit 1		
+	fi
+
 	if [ x"$use_fmod" == xtrue ] && [ x"$FMOD_ANDROID_SDK_ROOT" == x ]; then
 		echo "*** The FMOD SDK is not redistributed with the Moai SDK. Please download the FMOD EX"
 		echo "*** Programmers API SDK from http://fmod.org and install it. Then ensure that the"
@@ -117,6 +124,7 @@
 		existing_tapjoy_flags=$( sed -n '12p' libs/package.txt )
 		existing_twitter_flags=$( sed -n '13p' libs/package.txt )
 		existing_with_moai_components=$( sed -n '14p' libs/package.txt )
+		existing_use_yaml=$( sed -n '15p' libs/package.txt )
 
 		if [ x"$existing_arm_mode" != x"$arm_mode" ]; then
 			should_clean=true
@@ -139,6 +147,10 @@
 		fi
 
         if [ x"$existing_use_luajit" != x"$use_luajit" ]; then
+			should_clean=true
+		fi
+
+        if [ x"$existing_use_yaml" != x"$use_yaml" ]; then
 			should_clean=true
 		fi
 
@@ -196,6 +208,10 @@
 
     if [ x"$use_luajit" != xtrue ]; then
 		echo "LuaJIT will be disabled"
+	fi 
+
+    if [ x"$use_yaml" != xtrue ]; then
+		echo "YAML will be disabled"
 	fi 
 
 
@@ -261,6 +277,7 @@
 		sed -i.backup s%@USE_FMOD@%"$use_fmod"%g OptionalComponentsDefined.mk
 		sed -i.backup s%@USE_UNTZ@%"$use_untz"%g OptionalComponentsDefined.mk
 		sed -i.backup s%@USE_LUAJIT@%"$use_luajit"%g OptionalComponentsDefined.mk
+		sed -i.backup s%@USE_YAML@%"$use_yaml"%g OptionalComponentsDefined.mk
 		sed -i.backup s%@MOAI_COMPONENTS@%"$with_moai_components"%g OptionalComponentsDefined.mk
 		rm -f OptionalComponentsDefined.mk.backup
 	popd > /dev/null
@@ -307,3 +324,4 @@
 	echo "$tapjoy_flags" >> libs/package.txt
 	echo "$twitter_flags" >> libs/package.txt
 	echo "$with_moai_components" >> libs/package.txt
+	echo "$use_yaml" >> libs/package.txt

@@ -10,6 +10,10 @@
 	LOCAL_ARM_MODE 		:= $(MY_ARM_MODE)
 	LOCAL_CFLAGS		:= -include $(MY_MOAI_ROOT)/src/zl-vfs/zl_replace.h
 
+	ifeq ($(USE_YAML),true)
+		LOCAL_CFLAGS	+= -DMOAI_WITH_YAML=1
+	endif
+
 	LOCAL_C_INCLUDES 	:= $(MY_HEADER_SEARCH_PATHS)
 	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/3rdparty/luacrypto-0.2.0/src/lcrypto.c
 	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/3rdparty/luacurl-1.2.1/luacurl.c
