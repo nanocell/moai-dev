@@ -252,13 +252,17 @@
 	//----------------------------------------------------------------//
 	extern "C" void Java_com_ziplinegames_moai_Moai_AKUExtLoadLuacrypto ( JNIEnv* env, jclass obj ) {
 
-		AKUExtLoadLuacrypto ();
+		#if MOAI_WITH_CRYPTO
+			AKUExtLoadLuacrypto ();
+		#endif
 	}
 
 	//----------------------------------------------------------------//
 	extern "C" void Java_com_ziplinegames_moai_Moai_AKUExtLoadLuacurl ( JNIEnv* env, jclass obj ) {
 
-		AKUExtLoadLuacurl ();
+		#if MOAI_WITH_CURL
+			AKUExtLoadLuacurl ();
+		#endif
 	}
 
 	//----------------------------------------------------------------//
@@ -270,7 +274,9 @@
 	//----------------------------------------------------------------//
 	extern "C" void Java_com_ziplinegames_moai_Moai_AKUExtLoadLuasql ( JNIEnv* env, jclass obj ) {
 
-		AKUExtLoadLuasql ();
+		#if MOAI_WITH_SQLITE3
+			AKUExtLoadLuasql ();
+		#endif
 	}
 
 	//----------------------------------------------------------------//
