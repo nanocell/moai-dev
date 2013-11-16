@@ -2,12 +2,12 @@ cmake_minimum_required ( VERSION 2.8.5 )
 project ( moai-box2d )
 
 if ( MOAI_BOX2D )
-  set ( CMAKE_CURRENT_SOURCE_DIR "../../src/moai-box2d/" )
+  set ( CMAKE_CURRENT_SOURCE_DIR "${MOAI_ROOT}/src/moai-box2d/" )
 
   set ( MOAI_BOX2D_INCLUDES 
     ${THIRD_PARTY_INCLUDES}
-    "../../src/"
-    "../../src/config-default/"
+    "${MOAI_ROOT}/src/"
+    "${MOAI_ROOT}/src/config-default/"
 
    CACHE INTERNAL "doc string" )
 
