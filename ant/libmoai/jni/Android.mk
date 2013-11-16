@@ -173,6 +173,10 @@
 	LOCAL_STATIC_LIBRARIES += libsqlite
 	LOCAL_STATIC_LIBRARIES += libssl
 	LOCAL_STATIC_LIBRARIES += libtinyxml
+
+	ifdef MOAI_COMPONENTS
+		LOCAL_STATIC_LIBRARIES += libmoai-components
+	endif
 	
 	include $(BUILD_SHARED_LIBRARY)
 
@@ -217,3 +221,7 @@
 	include zlcore/Android.mk
 
 	include moaicore/Android.mk
+
+	ifdef MOAI_COMPONENTS
+		include $(MOAI_COMPONENTS)/ant/Android.mk
+	endif
