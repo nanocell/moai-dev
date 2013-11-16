@@ -280,6 +280,14 @@
 	}
 
 	//----------------------------------------------------------------//
+	extern "C" void Java_com_ziplinegames_moai_Moai_AKUExtLoadLuayaml ( JNIEnv* env, jclass obj ) {
+
+		#if MOAI_WITH_YAML
+			AKUExtLoadLuayaml ();
+		#endif
+	}
+
+	//----------------------------------------------------------------//
 	extern "C" void Java_com_ziplinegames_moai_Moai_AKUFinalize	( JNIEnv* env, jclass obj ) {
         #if MOAI_WITH_BOX2D
             AKUFinalizeBox2D ();

@@ -9,9 +9,9 @@
 	set -e
 
 	usage="usage: $0 -p <package> [-s] [-i thumb | arm] [-a all | armeabi | armeabi-v7a] [-l appPlatform] [--use-fmod \
-        true | false] [--use-untz true | false] [--use-luajit true | false] [--with-moai-components <path>] [--disable-adcolony] [--disable-billing] \
-        [--disable-chartboost] [--disable-crittercism] [--disable-facebook] [--disable-push] [--disable-tapjoy] \
-        [--disable-twitter]"
+        true | false] [--use-untz true | false] [--use-luajit true | false] [--use-yaml true | false] [--with-moai-components \
+        <path>] [--disable-adcolony] [--disable-billing] [--disable-chartboost] [--disable-crittercism] [--disable-facebook] \
+        [--disable-push] [--disable-tapjoy] [--disable-twitter]"
 	skip_build="false"
 	package_name=
 	arm_mode="arm"
@@ -20,6 +20,7 @@
 	use_fmod="false"
 	use_untz="true"
 	use_luajit="true"
+	use_yaml="false"
 	with_moai_components=
 	adcolony_flags=
 	billing_flags=
@@ -40,6 +41,7 @@
 			--use-fmod)  use_fmod="$2"; shift;;
 			--use-untz)  use_untz="$2"; shift;;
 			--use-luajit)  use_luajit="$2"; shift;;
+			--use-yaml)  use_yaml="$2"; shift;;
 			--with_moai_components)  with_moai_components="$2"; shift;;
 			--disable-adcolony)  adcolony_flags="--disable-adcolony";;
 			--disable-billing)  billing_flags="--disable-billing";;
@@ -90,6 +92,11 @@
 		exit 1		
 	fi
 
+    if [ x"$use_yaml" != xtrue ] && [ x"$use_yaml" != xfalse ]; then
+		echo $usage
+		exit 1		
+	fi
+
 	if [[ x"$with_moai_components" =~ ^x-.* ]]; then
 		echo $usage
 		exit 1
@@ -118,8 +125,8 @@
 	if [ x"$skip_build" != xtrue ]; then
 		pushd libmoai > /dev/null
 			bash build.sh -i $arm_mode -a $arm_arch -l $app_platform --use-fmod $use_fmod --use-untz $use_untz \
-                --use-luajit $use_luajit $moai_components_flags $adcolony_flags $billing_flags $chartboost_flags $crittercism_flags \
-                $facebook_flags $push_flags $tapjoy_flags $twitter_flags 
+                --use-luajit $use_luajit --use-yaml $use_yaml $moai_components_flags $adcolony_flags $billing_flags \
+                $chartboost_flags $crittercism_flags $facebook_flags $push_flags $tapjoy_flags $twitter_flags 
 		popd > /dev/null
 	fi
 
