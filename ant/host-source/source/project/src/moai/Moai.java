@@ -134,6 +134,7 @@ public class Moai {
 	protected static native void	AKUExtLoadLuacurl				();
 	protected static native void	AKUExtLoadLuasocket				();
 	protected static native void	AKUExtLoadLuasql				();
+	protected static native void	AKUExtLoadLuayaml				();
 	protected static native void	AKUFinalize 					();
 	protected static native void	AKUFMODExInit		 			();
 	protected static native void	AKUInit 						();
@@ -272,6 +273,7 @@ public class Moai {
 			AKUSetInputDeviceLocation ( Moai.InputDevice.INPUT_DEVICE.ordinal (), Moai.InputSensor.SENSOR_LOCATION.ordinal (), "location" );
 			AKUSetInputDeviceTouch ( Moai.InputDevice.INPUT_DEVICE.ordinal (), Moai.InputSensor.SENSOR_TOUCH.ordinal (), "touch" );
 
+			AKUExtLoadLuayaml ();
 			AKUExtLoadLuasql ();
 			AKUExtLoadLuacurl ();
 			AKUExtLoadLuacrypto ();

@@ -54,6 +54,13 @@
 		LOCAL_CFLAGS	+= -DMOAI_WITH_LUAJIT
 	endif
 
+	ifeq ($(USE_YAML),true)
+		LOCAL_CFLAGS	+= -DMOAI_WITH_YAML=1
+	endif
+
+	ifdef MOAI_COMPONENTS
+		LOCAL_CFLAGS	+= -DMOAI_WITH_EXT_COMPONENTS=1
+	endif
 	
 #----------------------------------------------------------------#
 # header search paths
@@ -124,6 +131,14 @@
 		MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/libvorbis-1.3.2/lib
 		MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/libogg-1.2.2/include
 	endif
+
+	ifeq ($(USE_YAML),true)
+		MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/libyaml-0.1.4/include
+	endif
+
+	ifdef MOAI_COMPONENTS
+		MY_HEADER_SEARCH_PATHS += $(MOAI_COMPONENTS)/include
+	endif
 	
 #----------------------------------------------------------------#
 # source files
@@ -174,6 +189,11 @@
 	LOCAL_STATIC_LIBRARIES += libssl
 	LOCAL_STATIC_LIBRARIES += libtinyxml
 
+	ifeq ($(USE_YAML),true)
+		LOCAL_STATIC_LIBRARIES += luayaml
+		LOCAL_STATIC_LIBRARIES += libyaml
+	endif
+
 	ifdef MOAI_COMPONENTS
 		LOCAL_STATIC_LIBRARIES += libmoai-components
 	endif
@@ -219,6 +239,11 @@
 	include ssl/Android.mk
 	include tinyxml/Android.mk
 	include zlcore/Android.mk
+
+	ifeq ($(USE_YAML),true)
+		include libyaml/Android.mk
+		include luayaml/Android.mk
+	endif
 
 	include moaicore/Android.mk
 
