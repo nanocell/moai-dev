@@ -29,6 +29,7 @@
 	push_flags=
 	tapjoy_flags=
 	twitter_flags=
+	build_threads=1
 	
 	while [ $# -gt 0 ];	do
 	    case "$1" in
@@ -49,6 +50,7 @@
 			--disable-push)  push_flags="-DDISABLE_NOTIFICATIONS";;
 			--disable-tapjoy)  tapjoy_flags="-DDISABLE_TAPJOY";;
 			--disable-twitter)  twitter_flags="-DDISABLE_TWITTER";;
+			--build_threads)  build_threads="$2";;
 			-*)
 		    	echo >&2 \
 		    		$usage
@@ -296,7 +298,7 @@
 	
 	# build libmoai
 	pushd jni > /dev/null
-		ndk-build $verbose
+		ndk-build --jobs $build_threads $verbose
 	popd > /dev/null
 
 	# remove temp files
