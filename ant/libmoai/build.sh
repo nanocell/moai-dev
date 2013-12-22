@@ -50,7 +50,7 @@
 			--disable-push)  push_flags="-DDISABLE_NOTIFICATIONS";;
 			--disable-tapjoy)  tapjoy_flags="-DDISABLE_TAPJOY";;
 			--disable-twitter)  twitter_flags="-DDISABLE_TWITTER";;
-			--build_threads)  build_threads="$2";;
+			--build_threads)  build_threads="$2"; shift;;			
 			-*)
 		    	echo >&2 \
 		    		$usage
