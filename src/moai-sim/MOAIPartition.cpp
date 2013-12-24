@@ -123,12 +123,14 @@ int MOAIPartition::_propForRay ( lua_State* L ) {
 	direction.mX = state.GetValue < float >( 5, 0.0f );
 	direction.mY = state.GetValue < float >( 6, 0.0f );
 	direction.mZ = state.GetValue < float >( 7, 0.0f );
+
+	u32 groupmask = state.GetValue<u32>(8, MOAIProp::DEFAULT_GROUPS);
 	
 	direction.Norm();
 	
 	MOAIPartitionResultBuffer& buffer = MOAIPartitionResultMgr::Get ().GetBuffer ();
 	
-	u32 total = self->GatherProps ( buffer, 0, vec, direction );
+	u32 total = self->GatherProps ( buffer, 0, vec, direction, 0xffffffff, groupmask );
 
 	if ( total ) {
 		
@@ -420,16 +422,16 @@ u32 MOAIPartition::GatherProps ( MOAIPartitionResultBuffer& results, MOAIProp* i
 }
 
 //----------------------------------------------------------------//
-u32 MOAIPartition::GatherProps ( MOAIPartitionResultBuffer& results, MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask ) {
+u32 MOAIPartition::GatherProps ( MOAIPartitionResultBuffer& results, MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask, u32 groupmask ) {
 	
 	results.Reset ();
 	
 	u32 totalLayers = this->mLevels.Size ();
 	for ( u32 i = 0; i < totalLayers; ++i ) {
-		this->mLevels [ i ].GatherProps ( results, ignore, point, orientation, mask );
+		this->mLevels [ i ].GatherProps ( results, ignore, point, orientation, mask, groupmask );
 	}
-	this->mBiggies.GatherProps ( results, ignore, point, orientation, mask );
-	this->mGlobals.GatherProps ( results, ignore, point, orientation, mask );
+	this->mBiggies.GatherProps ( results, ignore, point, orientation, mask, groupmask );
+	this->mGlobals.GatherProps ( results, ignore, point, orientation, mask, groupmask );
 	
 	return results.mTotalResults;
 }

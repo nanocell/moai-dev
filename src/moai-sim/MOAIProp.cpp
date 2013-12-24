@@ -24,6 +24,44 @@
 //================================================================//
 
 //----------------------------------------------------------------//
+/**	@name	addGroupMash
+	@text	Enable a mask bit.
+
+	@in		MOAIProp self
+	@in	  uint groupmask A group mask to enable
+	@opt  bool clear Clear the current group mask before applying the new mask
+	@out	nil
+*/
+int MOAIProp::_addGroupMask ( lua_State* L )
+{
+	MOAI_LUA_SETUP ( MOAIProp, "UN" )
+	u32 groupmask = state.GetValue < u32 >( 2, 0 );
+	bool clear = state.GetValue < u32 >( 2, false );
+	if (clear)
+		self->mGroupMask = groupmask;
+	else
+		self->mGroupMask |= groupmask;
+	return 0;
+}
+
+//----------------------------------------------------------------//
+/**	@name	removeGroupMask
+	@text	Removes the mask bits for the prop.
+
+	@in		MOAIProp self
+	@in	  uint mask A group mask to disable
+	@out	nil
+*/
+int MOAIProp::_removeGroupMask ( lua_State* L )
+{
+	MOAI_LUA_SETUP ( MOAIProp, "U" )
+	u32 groupmask = state.GetValue < u32 >( 2, 0 );
+	self->mGroupMask &= ~groupmask;
+ 	return 0;
+ }
+
+
+//----------------------------------------------------------------//
 /**	@name	getBounds
 	@text	Return the prop's local bounds or 'nil' if prop bounds is
 			global or missing. The bounds are in model space and will
@@ -1069,6 +1107,7 @@ MOAIProp::MOAIProp () :
 	mMask ( 0xffffffff ),
 	mPriority ( UNKNOWN_PRIORITY ),
 	mFlags ( DEFAULT_FLAGS ),
+	mGroupMask ( DEFAULT_GROUPS ),
 	mIndex( 1 ),
 	mGridScale ( 1.0f, 1.0f ),
 	mCullMode ( 0 ),
@@ -1175,6 +1214,18 @@ void MOAIProp::RegisterLuaClass ( MOAILuaState& state ) {
 	state.SetField ( -1, "CULL_ALL",					( u32 )ZGL_CULL_ALL );
 	state.SetField ( -1, "CULL_BACK",					( u32 )ZGL_CULL_BACK );
 	state.SetField ( -1, "CULL_FRONT",					( u32 )ZGL_CULL_FRONT );
+
+  state.SetField ( -1, "DEFAULT_GROUPS", ( u32 )DEFAULT_GROUPS );
+  state.SetField ( -1, "GROUP_1", ( u32 )GROUP_1 );
+  state.SetField ( -1, "GROUP_2", ( u32 )GROUP_2 );
+  state.SetField ( -1, "GROUP_3", ( u32 )GROUP_3 );
+  state.SetField ( -1, "GROUP_4", ( u32 )GROUP_4 );
+  state.SetField ( -1, "GROUP_5", ( u32 )GROUP_5 );
+  state.SetField ( -1, "GROUP_6", ( u32 )GROUP_6 );
+  state.SetField ( -1, "GROUP_7", ( u32 )GROUP_7 );
+  state.SetField ( -1, "GROUP_8", ( u32 )GROUP_8 );
+  state.SetField ( -1, "GROUP_9", ( u32 )GROUP_9 );
+  state.SetField ( -1, "GROUP_10", ( u32 )GROUP_10 );
 }
 
 //----------------------------------------------------------------//
@@ -1184,6 +1235,7 @@ void MOAIProp::RegisterLuaFuncs ( MOAILuaState& state ) {
 	MOAIColor::RegisterLuaFuncs ( state );
 
 	luaL_Reg regTable [] = {
+		{ "addGroupMask",			_addGroupMask },
 		{ "getBounds",			_getBounds },
 		{ "getDims",			_getDims },
 		{ "getGrid",			_getGrid },
@@ -1192,6 +1244,7 @@ void MOAIProp::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getWorldBounds",		_getWorldBounds },
 		{ "isVisible",			_isVisible },
 		{ "inside",				_inside },
+		{ "removeGroupMask",	_removeGroupMask },
 		{ "setBillboard",		_setBillboard },
 		{ "setBlendEquation",		_setBlendEquation },
 		{ "setBlendMode",		_setBlendMode },
