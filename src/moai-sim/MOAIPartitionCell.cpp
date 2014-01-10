@@ -40,7 +40,7 @@ void MOAIPartitionCell::ExtractProps ( MOAIPartitionCell& cell, MOAIPartitionLev
 }
 
 //----------------------------------------------------------------//
-void MOAIPartitionCell::GatherProps ( MOAIPartitionResultBuffer& results, const MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask ) {
+void MOAIPartitionCell::GatherProps ( MOAIPartitionResultBuffer& results, const MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask, u32 groupmask ) {
 	PropIt propIt = this->mProps.Head ();
 	for ( ; propIt; propIt = propIt->Next ()) {
 		MOAIProp* prop = propIt->Data ();
@@ -48,7 +48,8 @@ void MOAIPartitionCell::GatherProps ( MOAIPartitionResultBuffer& results, const 
 		if ( prop == ignore ) continue;
 		
 		float t;
-		if (( mask == 0 ) || ( prop->mMask & mask )) {
+		if ( (( mask == 0 ) || ( prop->mMask & mask )) && ((groupmask == 0) || (prop->mGroupMask & groupmask)) )
+		{
 			if ( !ZLSect::RayToBox( prop->mBounds, point, orientation, t )) {
 				prop->AddToSortBuffer ( results, ZLFloat::FloatToIntKey ( t ));
 			}

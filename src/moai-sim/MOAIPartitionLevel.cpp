@@ -38,11 +38,11 @@ void MOAIPartitionLevel::GatherProps ( MOAIPartitionResultBuffer& results, MOAIP
 }
 
 //----------------------------------------------------------------//
-void MOAIPartitionLevel::GatherProps ( MOAIPartitionResultBuffer& results, MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask ) {
+void MOAIPartitionLevel::GatherProps ( MOAIPartitionResultBuffer& results, MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask, u32 groupmask ) {
 	
 	u32 totalCells = this->mCells.Size ();
 	for ( u32 i = 0; i < totalCells; ++i ) {
-		this->mCells [ i ].GatherProps ( results, ignore, point, orientation, mask );
+		this->mCells [ i ].GatherProps ( results, ignore, point, orientation, mask, groupmask );
 	}
 }
 

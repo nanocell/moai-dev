@@ -61,7 +61,7 @@ public:
 	
 	//----------------------------------------------------------------//
 	void			Clear					();
-	u32				GatherProps				( MOAIPartitionResultBuffer& results, MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask = 0xffffffff );
+	u32				GatherProps				( MOAIPartitionResultBuffer& results, MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask = 0xffffffff, u32 groupmask=0 );
 	u32				GatherProps				( MOAIPartitionResultBuffer& results, MOAIProp* ignore, u32 mask = 0xffffffff );
 	u32				GatherProps				( MOAIPartitionResultBuffer& results, MOAIProp* ignore, const ZLVec3D& point, u32 mask = 0xffffffff );
 	u32				GatherProps				( MOAIPartitionResultBuffer& results, MOAIProp* ignore, ZLBox box, u32 mask = 0xffffffff );

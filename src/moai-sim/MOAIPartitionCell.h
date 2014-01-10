@@ -25,7 +25,7 @@ private:
 	//----------------------------------------------------------------//
 	void			Clear					();
 	void			ExtractProps			( MOAIPartitionCell& cell, MOAIPartitionLevel* layer );
-	void			GatherProps				( MOAIPartitionResultBuffer& results, const MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask );
+	void			GatherProps				( MOAIPartitionResultBuffer& results, const MOAIProp* ignore, const ZLVec3D& point, const ZLVec3D& orientation, u32 mask, u32 groupmask=0 );
 	void			GatherProps				( MOAIPartitionResultBuffer& results, const MOAIProp* ignore, u32 mask );
 	void			GatherProps				( MOAIPartitionResultBuffer& results, const MOAIProp* ignore, const ZLVec3D& point, u32 mask );
 	void			GatherProps				( MOAIPartitionResultBuffer& results, const MOAIProp* ignore, const ZLBox& box, u32 mask );

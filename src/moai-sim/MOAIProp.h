@@ -94,10 +94,13 @@ private:
 	MOAIProp*					mNextResult;
 
 	u32				mMask;
+	u32				mGroupMask;
+
 	ZLBox			mBounds;
 	s32				mPriority;
 	
 	//----------------------------------------------------------------//
+	static int    _addGroupMask      ( lua_State* L );
 	static int		_getBounds			( lua_State* L );
 	static int		_getDims			( lua_State* L );
 	static int		_getGrid			( lua_State* L );
@@ -106,6 +109,7 @@ private:
 	static int		_getWorldBounds		( lua_State* L );
 	static int		_isVisible			( lua_State* L );
 	static int		_inside				( lua_State* L );
+	static int    _removeGroupMask   ( lua_State* L );
 	static int		_setBillboard		( lua_State* L );
 	static int		_setBlendEquation	( lua_State* L );
 	static int		_setBlendMode		( lua_State* L );
@@ -126,6 +130,8 @@ private:
 	static int		_setTexture			( lua_State* L );
 	static int		_setUVTransform		( lua_State* L );
 	static int		_setVisible			( lua_State* L );
+	
+	
 
 	//----------------------------------------------------------------//
 	void			DrawGrid			( int subPrimID );
@@ -207,7 +213,21 @@ public:
 		FLAGS_VISIBLE				= 0x10, // this is a composite of FLAGS_LOCAL_VISIBLE plus the parent's ATTR_VISIBLE
 	};
 
+	enum {
+		GROUP_1 = 1,
+		GROUP_2 = 2,
+		GROUP_3 = 4,
+		GROUP_4 = 8,
+		GROUP_5 = 16,
+		GROUP_6 = 32,
+		GROUP_7 = 64,
+		GROUP_8 = 128,
+		GROUP_9 = 256,
+		GROUP_10 = 512,
+	};
+
 	static const u32 DEFAULT_FLAGS	= FLAGS_LOCAL_VISIBLE | FLAGS_VISIBLE;
+	static const u32 DEFAULT_GROUPS	= 0;
 
 	GET_SET ( u32, Index, mIndex )
 	GET_SET ( u32, Mask, mMask )
