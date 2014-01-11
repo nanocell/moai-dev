@@ -656,14 +656,17 @@ class aabb_callback_t : public b2QueryCallback
 	public:
 		virtual bool 	ReportFixture (b2Fixture *fixture)
 		{
-			this->fixtures.push_back(fixture);
+			// TODO: Perform additional b2OverlapTest to make sure that the given fixture overlaps
+			//       with the AABB, since the AABB can be quite loose
+			this->fixtures.insert(fixture);
 			return true;
 		}
 
-		std::vector<b2Fixture*> fixtures;
+		std::set<b2Fixture*> fixtures; 
 };
 
-int MOAIBox2DWorld::_queryAABB ( lua_State* L ) {
+int MOAIBox2DWorld::_queryAABB ( lua_State* L ) 
+{
 	MOAI_LUA_SETUP ( MOAIBox2DWorld, "UT" )
 
 	// Get a table with 4 floats (xmin, ymin, xmax, ymax)
@@ -706,18 +709,105 @@ int MOAIBox2DWorld::_queryAABB ( lua_State* L ) {
 	std::cout << "querying bbox: " << bbox[0] << ", " << bbox[1] << ", " << bbox[2] << "," << bbox[3] << std::endl;
 	self->mWorld->QueryAABB(&aabb_cb, aabb);
 
-	b2TestOverlap();
-
 	size_t num_items = aabb_cb.fixtures.size();
 	// Create a lua table to contain the results
 	lua_createtable(L, num_items, 0);
 	// MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
 	MOAIBox2DFixture* fixture = NULL;
 	std::cout << "num fixtures found: " << num_items << std::endl;
-	for (size_t i = 0; i < num_items; ++i)
+	size_t i = 0;
+	for (std::set<b2Fixture*>::iterator it = aabb_cb.fixtures.begin(); it != aabb_cb.fixtures.end(); 
+		++it, ++i)
 	{
-		fixture = (MOAIBox2DFixture*) aabb_cb.fixtures[i]->GetUserData();
-		// Push all the MOAIFixture objects onto the stack		
+		fixture = (MOAIBox2DFixture*) (*it)->GetUserData();
+		if (!fixture)
+			continue;
+		// Push all the MOAIFixture objects onto the stack
+		lua_pushnumber(L, i+1); // key 
+		fixture->PushLuaUserdata ( state ); // value
+		lua_settable(L, -3); // set the key/value pair
+	}
+
+	return 1;
+}
+
+int MOAIBox2DWorld::_queryAABBList ( lua_State* L ) 
+{
+	MOAI_LUA_SETUP ( MOAIBox2DWorld, "UT" )
+
+	// Get a table of tables containing 4 floats (xmin, ymin, xmax, ymax)
+	int is_table = lua_istable(L, -1);
+
+	if (!is_table)
+	{
+		luaL_error(state, "Expected table with bounding box coordinates");
+		return 0;
+	}
+
+	// iterate over a list of tables to extract a AABBs
+	b2AABB aabb;
+	std::list<b2AABB> aabb_list;
+	lua_pushnil(L);  // first key
+	while (lua_next(L, -2))
+	{
+		// 'key' (at index -2) and 'value' (at index -1)
+		if (lua_type(L, -1) != LUA_TTABLE)
+		{
+			luaL_error(L, "Expected an array of tables");
+			return 0;
+		}
+
+		// extract the four numbers (AABB) from the table (value)
+		std::vector<lua_Number> bbox;
+
+	  lua_pushnil(L);  // first key
+		while (lua_next(L, -2) != 0 && bbox.size()<4) 
+		{
+			// 'key' (at index -2) and 'value' (at index -1)
+			if (lua_type(L, -1) != LUA_TNUMBER)
+			{
+				luaL_error(L, "Expected a number for bbox coord");
+				return 0;
+			}
+			lua_Number n = lua_tonumber(L, -1);
+			bbox.push_back( n );
+			// removes 'value'; keeps 'key' for next iteration
+			lua_pop(L, 1);
+		}
+
+		if (bbox.size() < 4)
+		{
+			luaL_error(L, "Expected 4 numbers: {xmin, ymin, xmax, ymax}");
+			return 0;
+		}
+		
+		aabb.lowerBound = b2Vec2(bbox[0], bbox[1]);
+		aabb.upperBound = b2Vec2(bbox[2], bbox[3]);
+		aabb_list.push_back(aabb);
+
+		// removes 'value' (table); keeps 'key' for next iteration
+		lua_pop(L, 1);
+	} 
+
+	aabb_callback_t aabb_cb;
+	for (std::list<b2AABB>::iterator it = aabb_list.begin(); it != aabb_list.end(); ++it)
+	{
+		self->mWorld->QueryAABB(&aabb_cb, *it);
+	}
+
+	size_t num_items = aabb_cb.fixtures.size();
+	// Create a lua table to contain the results
+	lua_createtable(L, num_items, 0);
+
+	MOAIBox2DFixture* fixture = NULL;
+	size_t i = 0;
+	for (std::set<b2Fixture*>::iterator it = aabb_cb.fixtures.begin(); it != aabb_cb.fixtures.end(); 
+		++it, ++i)
+	{
+		fixture = (MOAIBox2DFixture*) (*it)->GetUserData();
+		if (!fixture)
+			continue;
+		// Push all the MOAIFixture objects onto the stack
 		lua_pushnumber(L, i+1); // key 
 		fixture->PushLuaUserdata ( state ); // value
 		lua_settable(L, -3); // set the key/value pair
@@ -1071,6 +1161,7 @@ void MOAIBox2DWorld::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getLinearSleepTolerance",	_getLinearSleepTolerance },
 		{ "getTimeToSleep",				_getTimeToSleep },
 		{ "queryAABB",	    			_queryAABB },
+		{ "queryAABBList",	    			_queryAABBList },
 		{ "setAngularSleepTolerance",	_setAngularSleepTolerance },
 		{ "setAutoClearForces",			_setAutoClearForces },
 		{ "setDebugDrawEnabled",		_setDebugDrawEnabled },
