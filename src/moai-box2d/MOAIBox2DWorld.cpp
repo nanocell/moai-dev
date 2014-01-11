@@ -706,7 +706,7 @@ int MOAIBox2DWorld::_queryAABB ( lua_State* L )
 	aabb.lowerBound = b2Vec2(bbox[0], bbox[1]);
 	aabb.upperBound = b2Vec2(bbox[2], bbox[3]);
 
-	std::cout << "querying bbox: " << bbox[0] << ", " << bbox[1] << ", " << bbox[2] << "," << bbox[3] << std::endl;
+	// std::cout << "querying bbox: " << bbox[0] << ", " << bbox[1] << ", " << bbox[2] << "," << bbox[3] << std::endl;
 	self->mWorld->QueryAABB(&aabb_cb, aabb);
 
 	size_t num_items = aabb_cb.fixtures.size();
@@ -714,7 +714,7 @@ int MOAIBox2DWorld::_queryAABB ( lua_State* L )
 	lua_createtable(L, num_items, 0);
 	// MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
 	MOAIBox2DFixture* fixture = NULL;
-	std::cout << "num fixtures found: " << num_items << std::endl;
+	// std::cout << "num fixtures found: " << num_items << std::endl;
 	size_t i = 0;
 	for (std::set<b2Fixture*>::iterator it = aabb_cb.fixtures.begin(); it != aabb_cb.fixtures.end(); 
 		++it, ++i)
