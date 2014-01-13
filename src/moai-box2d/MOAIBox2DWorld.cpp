@@ -654,15 +654,35 @@ int MOAIBox2DWorld::_getTimeToSleep ( lua_State* L ) {
 class aabb_callback_t : public b2QueryCallback
 {
 	public:
+		// Set an AABB
+		void set_aabb(const b2AABB& aabb)
+		{
+			b2Vec2 extents( aabb.GetExtents() );
+			_poly.SetAsBox(extents.x*0.6, extents.y*0.6);
+			_xform.Set(aabb.GetCenter(),0);
+			// std::cout << "set aabb: " << aabb.lowerBound.x << "," << aabb.lowerBound.y << "," << aabb.upperBound.x << "," << aabb.upperBound.y << std::endl;
+			// std::cout << "set poly: " << extents.x << ", " << extents.y << std::endl;
+			// std::cout << "set xform: " << aabb.GetCenter().x << ", " << aabb.GetCenter().y << std::endl;
+		}
+
 		virtual bool 	ReportFixture (b2Fixture *fixture)
 		{
-			// TODO: Perform additional b2OverlapTest to make sure that the given fixture overlaps
-			//       with the AABB, since the AABB can be quite loose
-			this->fixtures.insert(fixture);
+			bool overlap = b2TestOverlap(&_poly, 0, fixture->GetShape(), 0, _xform, 
+				fixture->GetBody()->GetTransform());
+			if (overlap)
+			{
+				// TODO: Perform additional b2OverlapTest to make sure that the given fixture overlaps
+				//       with the AABB, since the AABB can be quite loose
+				this->fixtures.insert(fixture);	
+			}
+
 			return true;
 		}
 
 		std::set<b2Fixture*> fixtures; 
+	private:
+		b2PolygonShape _poly;
+		b2Transform _xform;
 };
 
 int MOAIBox2DWorld::_queryAABB ( lua_State* L ) 
@@ -707,6 +727,7 @@ int MOAIBox2DWorld::_queryAABB ( lua_State* L )
 	aabb.upperBound = b2Vec2(bbox[2], bbox[3]);
 
 	// std::cout << "querying bbox: " << bbox[0] << ", " << bbox[1] << ", " << bbox[2] << "," << bbox[3] << std::endl;
+	aabb_cb.set_aabb(aabb);
 	self->mWorld->QueryAABB(&aabb_cb, aabb);
 
 	size_t num_items = aabb_cb.fixtures.size();
@@ -792,6 +813,7 @@ int MOAIBox2DWorld::_queryAABBList ( lua_State* L )
 	aabb_callback_t aabb_cb;
 	for (std::list<b2AABB>::iterator it = aabb_list.begin(); it != aabb_list.end(); ++it)
 	{
+		aabb_cb.set_aabb(*it);
 		self->mWorld->QueryAABB(&aabb_cb, *it);
 	}
 
