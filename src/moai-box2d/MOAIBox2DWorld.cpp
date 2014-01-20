@@ -658,7 +658,7 @@ class aabb_callback_t : public b2QueryCallback
 		void set_aabb(const b2AABB& aabb)
 		{
 			b2Vec2 extents( aabb.GetExtents() );
-			_poly.SetAsBox(extents.x*0.6, extents.y*0.6);
+			_poly.SetAsBox(extents.x, extents.y);
 			_xform.Set(aabb.GetCenter(),0);
 			// std::cout << "set aabb: " << aabb.lowerBound.x << "," << aabb.lowerBound.y << "," << aabb.upperBound.x << "," << aabb.upperBound.y << std::endl;
 			// std::cout << "set poly: " << extents.x << ", " << extents.y << std::endl;
@@ -673,6 +673,7 @@ class aabb_callback_t : public b2QueryCallback
 			{
 				// TODO: Perform additional b2OverlapTest to make sure that the given fixture overlaps
 				//       with the AABB, since the AABB can be quite loose
+				// std::cout << "overlap!" << std::endl;
 				this->fixtures.insert(fixture);	
 			}
 
@@ -723,10 +724,10 @@ int MOAIBox2DWorld::_queryAABB ( lua_State* L )
 
 	aabb_callback_t aabb_cb;
 	b2AABB aabb;
-	aabb.lowerBound = b2Vec2(bbox[0], bbox[1]);
-	aabb.upperBound = b2Vec2(bbox[2], bbox[3]);
+	aabb.lowerBound = b2Vec2(bbox[0]*self->mUnitsToMeters, bbox[1]*self->mUnitsToMeters);
+	aabb.upperBound = b2Vec2(bbox[2]*self->mUnitsToMeters, bbox[3]*self->mUnitsToMeters);
 
-	// std::cout << "querying bbox: " << bbox[0] << ", " << bbox[1] << ", " << bbox[2] << "," << bbox[3] << std::endl;
+	std::cout << "querying bbox: " << bbox[0] << ", " << bbox[1] << ", " << bbox[2] << "," << bbox[3] << std::endl;
 	aabb_cb.set_aabb(aabb);
 	self->mWorld->QueryAABB(&aabb_cb, aabb);
 
@@ -802,20 +803,42 @@ int MOAIBox2DWorld::_queryAABBList ( lua_State* L )
 			return 0;
 		}
 		
-		aabb.lowerBound = b2Vec2(bbox[0], bbox[1]);
-		aabb.upperBound = b2Vec2(bbox[2], bbox[3]);
+		aabb.lowerBound = b2Vec2(bbox[0]*self->mUnitsToMeters, bbox[1]*self->mUnitsToMeters);
+		aabb.upperBound = b2Vec2(bbox[2]*self->mUnitsToMeters, bbox[3]*self->mUnitsToMeters);
 		aabb_list.push_back(aabb);
 
 		// removes 'value' (table); keeps 'key' for next iteration
 		lua_pop(L, 1);
 	} 
 
+	std::cout << "-------------------------------------------" << std::endl;
 	aabb_callback_t aabb_cb;
 	for (std::list<b2AABB>::iterator it = aabb_list.begin(); it != aabb_list.end(); ++it)
 	{
 		aabb_cb.set_aabb(*it);
 		self->mWorld->QueryAABB(&aabb_cb, *it);
+
+		// DEBUG AABB
+		// b2BodyDef groundBodyDef;
+		// groundBodyDef.type = b2_kinematicBody;
+		// groundBodyDef.position.Set ( it->GetCenter().x, it->GetCenter().y );
+
+		// MOAIBox2DBody* body = new MOAIBox2DBody ();
+		// body->SetBody ( self->mWorld->CreateBody ( &groundBodyDef ));
+		// body->mBody->SetType( b2_kinematicBody );
+		// body->SetWorld ( self );
+		// self->LuaRetain ( body );
+
+		// b2PolygonShape polygonShape;
+		// polygonShape.SetAsBox ( aabb.GetExtents().x, aabb.GetExtents().y, b2Vec2(0,0), 0 );
+		// b2FixtureDef fixtureDef;
+		// fixtureDef.shape = &polygonShape;
+		// MOAIBox2DFixture* fixture = new MOAIBox2DFixture ();
+		// fixture->SetFixture ( body->mBody->CreateFixture ( &fixtureDef ));
+		// fixture->mFixture->SetSensor(true);
+		// self->LuaRetain ( fixture );
 	}
+	std::cout << "-------------------------------------------" << std::endl;
 
 	size_t num_items = aabb_cb.fixtures.size();
 	// Create a lua table to contain the results
