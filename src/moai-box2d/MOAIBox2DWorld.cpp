@@ -643,6 +643,223 @@ int MOAIBox2DWorld::_getTimeToSleep ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	queryAABB
+	@text	See Box2D documentation.
+	
+	@in		MOAIBox2DWorld self
+	@opt	number angularSleepTolerance		in degrees/s, converted to radians/s. Default value is 0.0f.
+	@out	nil
+*/
+
+class aabb_callback_t : public b2QueryCallback
+{
+	public:
+		// Set an AABB
+		void set_aabb(const b2AABB& aabb)
+		{
+			b2Vec2 extents( aabb.GetExtents() );
+			_poly.SetAsBox(extents.x, extents.y);
+			_xform.Set(aabb.GetCenter(),0);
+			// std::cout << "set aabb: " << aabb.lowerBound.x << "," << aabb.lowerBound.y << "," << aabb.upperBound.x << "," << aabb.upperBound.y << std::endl;
+			// std::cout << "set poly: " << extents.x << ", " << extents.y << std::endl;
+			// std::cout << "set xform: " << aabb.GetCenter().x << ", " << aabb.GetCenter().y << std::endl;
+		}
+
+		virtual bool 	ReportFixture (b2Fixture *fixture)
+		{
+			bool overlap = b2TestOverlap(&_poly, 0, fixture->GetShape(), 0, _xform, 
+				fixture->GetBody()->GetTransform());
+			if (overlap)
+			{
+				// TODO: Perform additional b2OverlapTest to make sure that the given fixture overlaps
+				//       with the AABB, since the AABB can be quite loose
+				// std::cout << "overlap!" << std::endl;
+				this->fixtures.insert(fixture);	
+			}
+
+			return true;
+		}
+
+		std::set<b2Fixture*> fixtures; 
+	private:
+		b2PolygonShape _poly;
+		b2Transform _xform;
+};
+
+int MOAIBox2DWorld::_queryAABB ( lua_State* L ) 
+{
+	MOAI_LUA_SETUP ( MOAIBox2DWorld, "UT" )
+
+	// Get a table with 4 floats (xmin, ymin, xmax, ymax)
+	int is_table = lua_istable(L, -1);
+
+	if (!is_table)
+	{
+		luaL_error(state, "Expected table with bounding box coordinates");
+		return 0;
+	}
+
+	std::vector<lua_Number> bbox;
+
+  lua_pushnil(L);  // first key
+	while (lua_next(L, -2) != 0 && bbox.size()<4) 
+	{
+		// 'key' (at index -2) and 'value' (at index -1)
+		if (lua_type(L, -1) != LUA_TNUMBER)
+		{
+			luaL_error(L, "Expected a number for bbox coord");
+			return 0;
+		}
+		lua_Number n = lua_tonumber(L, -1);
+		bbox.push_back( n );
+		// removes 'value'; keeps 'key' for next iteration
+		lua_pop(L, 1);
+	}
+
+	if (bbox.size() < 4)
+	{
+		luaL_error(L, "Expected 4 numbers: {xmin, ymin, xmax, ymax}");
+		return 0;
+	}
+
+	aabb_callback_t aabb_cb;
+	b2AABB aabb;
+	aabb.lowerBound = b2Vec2(bbox[0]*self->mUnitsToMeters, bbox[1]*self->mUnitsToMeters);
+	aabb.upperBound = b2Vec2(bbox[2]*self->mUnitsToMeters, bbox[3]*self->mUnitsToMeters);
+
+	aabb_cb.set_aabb(aabb);
+	self->mWorld->QueryAABB(&aabb_cb, aabb);
+
+	size_t num_items = aabb_cb.fixtures.size();
+	// Create a lua table to contain the results
+	lua_createtable(L, num_items, 0);
+	// MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
+	MOAIBox2DFixture* fixture = NULL;
+	size_t i = 0;
+	for (std::set<b2Fixture*>::iterator it = aabb_cb.fixtures.begin(); it != aabb_cb.fixtures.end(); 
+		++it, ++i)
+	{
+		fixture = (MOAIBox2DFixture*) (*it)->GetUserData();
+		if (!fixture)
+			continue;
+		// Push all the MOAIFixture objects onto the stack
+		lua_pushnumber(L, i+1); // key 
+		fixture->PushLuaUserdata ( state ); // value
+		lua_settable(L, -3); // set the key/value pair
+	}
+
+	return 1;
+}
+
+int MOAIBox2DWorld::_queryAABBList ( lua_State* L ) 
+{
+	MOAI_LUA_SETUP ( MOAIBox2DWorld, "UT" )
+
+	// Get a table of tables containing 4 floats (xmin, ymin, xmax, ymax)
+	int is_table = lua_istable(L, -1);
+
+	if (!is_table)
+	{
+		luaL_error(state, "Expected table with bounding box coordinates");
+		return 0;
+	}
+
+	// iterate over a list of tables to extract a AABBs
+	b2AABB aabb;
+	std::list<b2AABB> aabb_list;
+	lua_pushnil(L);  // first key
+	while (lua_next(L, -2))
+	{
+		// 'key' (at index -2) and 'value' (at index -1)
+		if (lua_type(L, -1) != LUA_TTABLE)
+		{
+			luaL_error(L, "Expected an array of tables");
+			return 0;
+		}
+
+		// extract the four numbers (AABB) from the table (value)
+		std::vector<lua_Number> bbox;
+
+	  lua_pushnil(L);  // first key
+		while (lua_next(L, -2) != 0 && bbox.size()<4) 
+		{
+			// 'key' (at index -2) and 'value' (at index -1)
+			if (lua_type(L, -1) != LUA_TNUMBER)
+			{
+				luaL_error(L, "Expected a number for bbox coord");
+				return 0;
+			}
+			lua_Number n = lua_tonumber(L, -1);
+			bbox.push_back( n );
+			// removes 'value'; keeps 'key' for next iteration
+			lua_pop(L, 1);
+		}
+
+		if (bbox.size() < 4)
+		{
+			luaL_error(L, "Expected 4 numbers: {xmin, ymin, xmax, ymax}");
+			return 0;
+		}
+		
+		aabb.lowerBound = b2Vec2(bbox[0]*self->mUnitsToMeters, bbox[1]*self->mUnitsToMeters);
+		aabb.upperBound = b2Vec2(bbox[2]*self->mUnitsToMeters, bbox[3]*self->mUnitsToMeters);
+		aabb_list.push_back(aabb);
+
+		// removes 'value' (table); keeps 'key' for next iteration
+		lua_pop(L, 1);
+	} 
+
+	std::cout << "-------------------------------------------" << std::endl;
+	aabb_callback_t aabb_cb;
+	for (std::list<b2AABB>::iterator it = aabb_list.begin(); it != aabb_list.end(); ++it)
+	{
+		aabb_cb.set_aabb(*it);
+		self->mWorld->QueryAABB(&aabb_cb, *it);
+
+		// DEBUG AABB
+		// b2BodyDef groundBodyDef;
+		// groundBodyDef.type = b2_kinematicBody;
+		// groundBodyDef.position.Set ( it->GetCenter().x, it->GetCenter().y );
+
+		// MOAIBox2DBody* body = new MOAIBox2DBody ();
+		// body->SetBody ( self->mWorld->CreateBody ( &groundBodyDef ));
+		// body->mBody->SetType( b2_kinematicBody );
+		// body->SetWorld ( self );
+		// self->LuaRetain ( body );
+
+		// b2PolygonShape polygonShape;
+		// polygonShape.SetAsBox ( aabb.GetExtents().x, aabb.GetExtents().y, b2Vec2(0,0), 0 );
+		// b2FixtureDef fixtureDef;
+		// fixtureDef.shape = &polygonShape;
+		// MOAIBox2DFixture* fixture = new MOAIBox2DFixture ();
+		// fixture->SetFixture ( body->mBody->CreateFixture ( &fixtureDef ));
+		// fixture->mFixture->SetSensor(true);
+		// self->LuaRetain ( fixture );
+	}
+	std::cout << "-------------------------------------------" << std::endl;
+
+	size_t num_items = aabb_cb.fixtures.size();
+	// Create a lua table to contain the results
+	lua_createtable(L, num_items, 0);
+
+	MOAIBox2DFixture* fixture = NULL;
+	size_t i = 0;
+	for (std::set<b2Fixture*>::iterator it = aabb_cb.fixtures.begin(); it != aabb_cb.fixtures.end(); 
+		++it, ++i)
+	{
+		fixture = (MOAIBox2DFixture*) (*it)->GetUserData();
+		if (!fixture)
+			continue;
+		// Push all the MOAIFixture objects onto the stack
+		lua_pushnumber(L, i+1); // key 
+		fixture->PushLuaUserdata ( state ); // value
+		lua_settable(L, -3); // set the key/value pair
+	}
+
+	return 1;
+}
+
+//----------------------------------------------------------------//
 /**	@name	setAngularSleepTolerance
 	@text	See Box2D documentation.
 	
@@ -986,6 +1203,8 @@ void MOAIBox2DWorld::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getGravity",					_getGravity },
 		{ "getLinearSleepTolerance",	_getLinearSleepTolerance },
 		{ "getTimeToSleep",				_getTimeToSleep },
+		{ "queryAABB",	    			_queryAABB },
+		{ "queryAABBList",	    			_queryAABBList },
 		{ "setAngularSleepTolerance",	_setAngularSleepTolerance },
 		{ "setAutoClearForces",			_setAutoClearForces },
 		{ "setDebugDrawEnabled",		_setDebugDrawEnabled },

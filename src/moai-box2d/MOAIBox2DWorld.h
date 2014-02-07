@@ -96,6 +96,8 @@ private:
 	static int		_getGravity					( lua_State* L );
 	static int		_getLinearSleepTolerance	( lua_State* L );
 	static int		_getTimeToSleep				( lua_State* L );
+	static int    _queryAABB            ( lua_State* L );
+	static int    _queryAABBList            ( lua_State* L );
 	static int		_setAngularSleepTolerance	( lua_State* L );
 	static int		_setAutoClearForces			( lua_State* L );
 	static int		_setDebugDrawEnabled		( lua_State* L );
