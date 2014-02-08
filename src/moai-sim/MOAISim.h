@@ -7,6 +7,7 @@
 #include <moai-sim/MOAIEaseDriver.h>
 #include <moai-util/MOAITaskSubscriber.h>
 #include <moai-util/MOAITaskThread.h>
+#include <unistd.h>
 
 class MOAIProp;
 

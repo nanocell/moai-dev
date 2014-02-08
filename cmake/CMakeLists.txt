@@ -104,6 +104,12 @@ if ( DEBUG )
 endif ( DEBUG )
 
 #
+# Third party libraries
+#
+
+add_subdirectory ( third-party )
+
+#
 # Moai External Components
 #
 
@@ -117,7 +123,7 @@ endif (MOAI_COMPONENTS)
 #
 # Libraries
 #
-add_subdirectory ( third-party )
+
 add_subdirectory ( zlcore )
 
 add_subdirectory ( moai-core )
