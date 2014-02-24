@@ -109,6 +109,8 @@ int MOAIPartition::_propForPoint ( lua_State* L ) {
 	@in		number xdirection
 	@in		number ydirection
 	@in		number zdirection
+	@opt	number sortMode			One of the MOAILayer sort modes. Default value is SORT_PRIORITY_ASCENDING.
+	@opt	number groupMask		MOAIProp group mask. All props outside this group mask will be ignored. Default: MOAIProp.DEFAULT_GROUPS
 	@out	MOAIProp prop		The prop under the point in order of depth or nil if no prop found.
 */
 int MOAIPartition::_propForRay ( lua_State* L ) {
@@ -124,22 +126,37 @@ int MOAIPartition::_propForRay ( lua_State* L ) {
 	direction.mY = state.GetValue < float >( 6, 0.0f );
 	direction.mZ = state.GetValue < float >( 7, 0.0f );
 
-	u32 groupmask = state.GetValue<u32>(8, MOAIProp::DEFAULT_GROUPS);
+	u32 sortMode = state.GetValue < u32 >( 8, MOAIPartitionResultBuffer::SORT_NONE );
+	u32 group_mask = state.GetValue < u32 >( 9, MOAIProp::DEFAULT_GROUPS );
 	
 	direction.Norm();
 	
 	MOAIPartitionResultBuffer& buffer = MOAIPartitionResultMgr::Get ().GetBuffer ();
 	
-	u32 total = self->GatherProps ( buffer, 0, vec, direction, 0xffffffff, groupmask );
+	// u32 total = self->GatherProps ( buffer, 0, vec, direction, 0xffffffff, groupmask );
+	u32 total = self->GatherProps ( buffer, 0, vec, direction, 0, group_mask );
 
 	if ( total ) {
-		
+		// buffer.Sort ( MOAIPartitionResultBuffer::SORT_NONE );
+		// std::cout << "total props ("<< total <<") hit with dir: " << direction.mX << "," << direction.mY << "," << direction.mZ << std::endl;
+		// std::cout << "sort mode: " << sortMode << std::endl;
+		buffer.Sort ( MOAIPartitionResultBuffer::SORT_NONE ); //??
+		buffer.GenerateKeys ( sortMode, direction.mX, direction.mY, direction.mZ, 0.f );
 		MOAIProp* prop = buffer.FindBest ();
 		if ( prop ) {
 			prop->PushLuaUserdata ( state );
 			return 1;
 		}
 	}
+
+	// if ( total ) {
+		
+	// 	MOAIProp* prop = buffer.FindBest ();
+	// 	if ( prop ) {
+	// 		prop->PushLuaUserdata ( state );
+	// 		return 1;
+	// 	}
+	// }
 
 	return 0;
 }
